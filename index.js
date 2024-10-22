@@ -5,6 +5,8 @@
 var express = require('express');
 var app = express();
 
+let date = new Date("170000000000");
+console.log(date.toUTCString());
 // enable CORS (https://en.wikipedia.org/wiki/Cross-origin_resource_sharing)
 // so that your API is remotely testable by FCC 
 var cors = require('cors');
@@ -25,19 +27,31 @@ app.get("/api/hello", function (req, res) {
 });
 
 app.get("/api/:date", function (req, res) {
-  let dateArr = req.params.date.split("-");
-  let dateString = dateArr.join("");
-  console.log(dateString);
-  if (isNaN(dateString)) {
-    res.json({error: "Invalid Date"});
-  } else {
-    if (dateArr.length > 1) {
-      var date = new Date(dateArr[0],dateArr[1]-1,dateArr[2]);
+  let date = new Date(req.params.date);
+  if (isNaN(date.getTime())) {
+    if (isNaN(req.params.date)) {
+      res.json({error: "Invalid Date"});
     } else {
-      var date = new Date(parseInt(dateArr[0]));
+      req.params.date = parseInt(req.params.date);
+      let date2 = new Date(req.params.date);
+      res.json({"unix": date2.getTime(), "utc": date2.toUTCString()});
     }
+  } else {
+    res.json({"unix": date.getTime(), "utc": date.toUTCString()});
   }
-  res.json({"unix": date.getTime(), "utc": date.toUTCString()});
+  // let dateArr = req.params.date.split("-");
+  // let dateString = dateArr.join("");
+  // console.log(dateString);
+  // if (isNaN(dateString)) {
+  //   res.json({error: "Invalid Date"});
+  // } else {
+  //   if (dateArr.length > 1) {
+  //     var date = new Date(dateArr[0],dateArr[1]-1,dateArr[2]);
+  //   } else {
+  //     var date = new Date(parseInt(dateArr[0]));
+  //   }
+  // }
+  // res.json({"unix": date.getTime(), "utc": date.toUTCString()});
 });
 
 app.get("/api", function (req, res) {
